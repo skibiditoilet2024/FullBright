@@ -12,4 +12,8 @@ public class Utils {
     public static float getTransitionSpeed() {
         return (float) 3.0 * FB.transitionSpeed / 500;
     }
+
+    public static boolean inRange(float a, float b, float epsilon) {
+        return Math.abs(a - b) < epsilon;
+    }
 }

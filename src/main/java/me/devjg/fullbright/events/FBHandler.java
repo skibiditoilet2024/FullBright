@@ -14,10 +14,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public class FBHandler {
     private static final Minecraft mc = Minecraft.getMinecraft();
 
-    private static final float DIMMEST = -0.1F;
-    private static final float DIM = 3.0F;
-    private static final float BRIGHT = 6.5F;
-    private static final float BRIGHTEST = 12.0F;
+    private static final float DIMMEST = -0.1f;
+    private static final float DIM = 3.0f;
+    private static final float BRIGHT = 6.5f;
+    private static final float BRIGHTEST = 12.0f;
 
     private static boolean shouldIncrement;
     private static float nextLevel;
@@ -69,13 +69,13 @@ public class FBHandler {
 
     private static void setNextLevel() {
         float currentLevel = mc.gameSettings.gammaSetting;
+        float epsilon = 2.0f;
 
-        // TODO refactor
-        if (2 >= Math.abs(DIMMEST - currentLevel))
+        if (Utils.inRange(currentLevel, DIMMEST, epsilon))
             nextLevel = DIM;
-        else if (2 >= Math.abs(DIM - currentLevel))
+        else if (Utils.inRange(currentLevel, DIM, epsilon))
             nextLevel = BRIGHT;
-        else if (2 >= Math.abs(BRIGHT - currentLevel))
+        else if (Utils.inRange(currentLevel, BRIGHT, epsilon))
             nextLevel = BRIGHTEST;
         else
             nextLevel = DIMMEST;
@@ -88,37 +88,24 @@ public class FBHandler {
                 EnumChatFormatting.DARK_GRAY + "] " +
                 EnumChatFormatting.GRAY + "set to ";
 
-        // TODO refactor
-        if ("Incremental".equals(FB.getMode())) {
-            if (DIMMEST == nextLevel)
-                return TEXT_BASE + EnumChatFormatting.DARK_RED + "DIMMEST";
-            else if (DIM == nextLevel)
-                return TEXT_BASE + EnumChatFormatting.RED + "DIM";
-            else if (BRIGHT == nextLevel)
-                return TEXT_BASE + EnumChatFormatting.YELLOW + "BRIGHT";
-            return TEXT_BASE + EnumChatFormatting.GREEN + "BRIGHTEST";
-        }
-
-        else {
-            if (DIMMEST == nextLevel)
-                return TEXT_BASE + EnumChatFormatting.GREEN + "BRIGHTEST";
-            else if (DIM == nextLevel)
-                return TEXT_BASE + EnumChatFormatting.DARK_RED + "DIMMEST";
-            else if (BRIGHT == nextLevel)
-                return TEXT_BASE + EnumChatFormatting.RED + "DIM";
+        if (DIMMEST == nextLevel)
+            return TEXT_BASE + EnumChatFormatting.DARK_RED + "DIMMEST";
+        else if (DIM == nextLevel)
+            return TEXT_BASE + EnumChatFormatting.RED + "DIM";
+        else if (BRIGHT == nextLevel)
             return TEXT_BASE + EnumChatFormatting.YELLOW + "BRIGHT";
-        }
+        return TEXT_BASE + EnumChatFormatting.GREEN + "BRIGHTEST";
     }
 
     private void keyPressed() {
         final String CURRENT_MODE = FB.getMode();
 
+        if (FB.notifications)
+            mc.thePlayer.addChatMessage(new ChatComponentText(getText()));
+
         if ("Instantaneous".equals(CURRENT_MODE))
             instantChange(nextLevel);
         else if ("Incremental".equals(CURRENT_MODE))
             shouldIncrement = true;
-
-        if (FB.notifications)
-            mc.thePlayer.addChatMessage(new ChatComponentText(getText()));
     }
 }
